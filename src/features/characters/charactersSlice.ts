@@ -48,6 +48,7 @@ export const { setPage, setFilter, setCharacters, setTotal } =
 // Selectors
 export const selectFilter = (state: RootState) => state.characters.filter;
 export const selectPage = (state: RootState) => state.characters.currentPage;
+export const selectTotal = (state: RootState) => state.characters.total;
 export const selectCharacters = (state: RootState) =>
   state.characters.characters;
 export const selectCharacterById = (
@@ -57,7 +58,7 @@ export const selectCharacterById = (
     state.characters.characters.find((character) => character.id === id);
 };
 
-// Async thunk
+// Async
 export const getListOfCharacters =
   (page = 1, filter = '') =>
   (dispatch: AppDispatch) => {

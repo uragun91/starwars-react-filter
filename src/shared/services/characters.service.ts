@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import { Character } from '../../features/characters/models/character.model';
 import { http } from '../axios';
 import { QueryParams } from '../models/query-params.model';
@@ -27,7 +26,7 @@ export const loadListOfCharacters = (
     .get<CharactersResponse<CharacterWithUrl>>('/people', { params })
     .then((charactersResponse) => {
       const characters = charactersResponse.data.results.map(
-        convertToWithCharacterWithId
+        convertToOrdinaryCharacter
       );
 
       const { next, count, previous } = charactersResponse.data;
@@ -41,15 +40,16 @@ export const loadListOfCharacters = (
     });
 };
 
-const convertToWithCharacterWithId = (
-  character: CharacterWithUrl
-): Character => {
+const convertToOrdinaryCharacter = (character: CharacterWithUrl): Character => {
   const urlSplit = character.url?.split('/');
   delete character.url;
+  const id = parseInt(urlSplit ? urlSplit[urlSplit.length - 2] : '0');
 
   const result: Character = {
     ...character,
-    id: parseInt(urlSplit ? urlSplit[urlSplit.length - 1] : '0'),
+    img:
+      'https://starwars-visualguide.com/assets/img/characters/' + id + '.jpg',
+    id: parseInt(urlSplit ? urlSplit[urlSplit.length - 2] : '0'),
   };
 
   return result;

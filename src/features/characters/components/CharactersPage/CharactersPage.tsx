@@ -7,6 +7,7 @@ import {
   selectCharacters,
   selectFilter,
   selectPage,
+  selectTotal,
 } from '../../charactersSlice';
 
 export const CharactersPage = () => {
@@ -14,6 +15,7 @@ export const CharactersPage = () => {
 
   const filter = useSelector(selectFilter);
   const page = useSelector(selectPage);
+  const total = useSelector(selectTotal);
 
   const characters = useSelector(selectCharacters);
 
@@ -25,8 +27,9 @@ export const CharactersPage = () => {
   return (
     <>
       <div>Characters Page</div>
+      <div>Total is: {total}</div>
       {characters.map((character) => {
-        return <div>{character.name}</div>;
+        return <div key={character.id}>{character.name}</div>;
       })}
     </>
   );

@@ -2,6 +2,7 @@ import { Gender } from '../../../shared/models/gender.enum';
 
 export interface Character {
   id: number;
+  img: string;
   name: string;
   height: string;
   mass: string;
