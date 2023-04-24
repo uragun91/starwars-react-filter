@@ -1,18 +1,19 @@
+import { createTheme, ThemeProvider } from '@mui/material';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
-import { store } from './store/store';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { CharactersPage } from './features/characters/components/CharactersPage/CharactersPage';
-import { CharacterPage } from './features/characters/components/CharacterPage/CharacterPage';
 
+import './index.css';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import './index.css';
-import { createTheme, ThemeProvider } from '@mui/material';
+
+import { CharacterPage } from './features/characters/components/CharacterPage/CharacterPage';
+import { CharactersPage } from './features/characters/components/CharactersPage/CharactersPage';
+import reportWebVitals from './reportWebVitals';
+import { store } from './store/store';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

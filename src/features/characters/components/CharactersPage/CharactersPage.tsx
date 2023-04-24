@@ -75,7 +75,9 @@ export const CharactersPage = () => {
         </Typography>
         <div className={styles.listControls}>
           <TextField
+            sx={{ minWidth: 250 }}
             onChange={debouncedSearchChangeHandler}
+            className={styles.searchInput}
             size="small"
             label="Search character"
             InputProps={{

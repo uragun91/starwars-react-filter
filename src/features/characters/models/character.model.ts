@@ -25,3 +25,12 @@ export interface Character {
   // ISO date
   edited: string;
 }
+
+export type CharacterWithUrl = Omit<Character, 'id'> & { url?: string };
+
+export interface CharactersResponse<T> {
+  results: T[];
+  count: number;
+  next: string;
+  previous: string;
+}

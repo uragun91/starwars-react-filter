@@ -1,14 +1,10 @@
-import { Character } from '../../features/characters/models/character.model';
+import {
+  Character,
+  CharactersResponse,
+  CharacterWithUrl,
+} from '../../features/characters/models/character.model';
 import { http } from '../axios';
 import { QueryParams } from '../models/query-params.model';
-
-type CharacterWithUrl = Omit<Character, 'id'> & { url?: string };
-interface CharactersResponse<T> {
-  results: T[];
-  count: number;
-  next: string;
-  previous: string;
-}
 
 const convertToOrdinaryCharacter = (character: CharacterWithUrl): Character => {
   const urlSplit = character.url?.split('/');
