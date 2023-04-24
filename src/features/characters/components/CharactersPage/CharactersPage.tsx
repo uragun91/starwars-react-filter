@@ -90,6 +90,7 @@ export const CharactersPage = () => {
           />
 
           <Pagination
+            data-testid="paginator"
             count={Math.ceil(total / 10)}
             page={page}
             showFirstButton
