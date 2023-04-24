@@ -8,6 +8,7 @@
 }
 
 .cardsContainer {
+  position: relative;
   display: flex;
   gap: 50px;
   flex-wrap: wrap;
@@ -15,9 +16,29 @@
 
 .header {
   color: #ffffff;
-  margin-bottom: 50px;
+  text-align: center;
 }
 
 .noCharactersText {
   color: #ffffff;
+}
+
+.listControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  column-gap: 75px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .cardsContainer {
+    justify-content: center;
+  }
+
+  .listControls {
+    justify-content: center;
+  }
 }

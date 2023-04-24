@@ -12,7 +12,7 @@ import styles from './CharacterCard.module.css';
 
 export const CharacterCard = ({ character }: { character?: Character }) => {
   return (
-    <Card sx={{ maxWidth: 180, minWidth: 180 }} className={styles.card}>
+    <Card className={styles.card}>
       <CardMedia component="img" alt="green iguana" image={character?.img} />
       <CardContent className={styles.cardContent}>
         <Typography gutterBottom variant="h5" component="div">

@@ -2,6 +2,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import {
   Container,
   InputAdornment,
+  Paper,
   TextField,
   Typography,
 } from '@mui/material';
@@ -15,6 +16,7 @@ import {
   getListOfCharacters,
   selectCharacters,
   selectFilter,
+  selectIsLoadingList,
   selectPage,
   selectTotal,
   setFilter,
@@ -30,6 +32,7 @@ export const CharactersPage = () => {
   const filter = useSelector(selectFilter);
   const page = useSelector(selectPage);
   const total = useSelector(selectTotal);
+  const isLoading = useSelector(selectIsLoadingList);
 
   const characters = useSelector(selectCharacters);
 
@@ -41,6 +44,7 @@ export const CharactersPage = () => {
   const searchChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
     useCallback(
       (e) => {
+        dispatch(setPage(1));
         dispatch(setFilter(e.target.value));
       },
       [dispatch]
@@ -61,10 +65,15 @@ export const CharactersPage = () => {
   return (
     <div className={styles.charactersWrapper}>
       <Container fixed>
-        <Typography variant="h2" component="h2" className={styles.header}>
+        <Typography
+          component="h2"
+          variant="h3"
+          sx={{ mb: 4 }}
+          className={styles.header}
+        >
           Star wars characters
         </Typography>
-        <div>
+        <div className={styles.listControls}>
           <TextField
             onChange={debouncedSearchChangeHandler}
             size="small"
@@ -77,24 +86,29 @@ export const CharactersPage = () => {
               ),
             }}
           />
-          {!Boolean(characters.length) ? (
-            <Typography className={styles.noCharactersText}>
-              No characters found. Please change search string
-            </Typography>
-          ) : (
-            ''
-          )}
+
           <Pagination
             count={Math.ceil(total / 10)}
             page={page}
             showFirstButton
             showLastButton
+            siblingCount={0}
             size="small"
             onChange={paginationChangeHandler}
           />
         </div>
-        <div>Total is: {total}</div>
-        <div>Filter is: {filter}</div>
+
+        <Paper
+          sx={{
+            visibility:
+              isLoading || !Boolean(characters.length) ? 'visible' : 'hidden',
+            mb: 3,
+            p: 3,
+          }}
+        >
+          {isLoading ? 'Loading...' : 'No characters found'}
+        </Paper>
+
         <div className={styles.cardsContainer}>
           {characters.map((character) => {
             return (

@@ -10,6 +10,7 @@ export interface CharactersState {
   filter: string;
   characters: Character[];
   currentCharacter: Character | null;
+  isLoadingList: boolean;
 }
 
 const initialState: CharactersState = {
@@ -18,6 +19,7 @@ const initialState: CharactersState = {
   filter: '',
   characters: [],
   currentCharacter: null,
+  isLoadingList: false,
 };
 
 export const charactersSlice = createSlice({
@@ -32,6 +34,12 @@ export const charactersSlice = createSlice({
     },
     setTotal: (state: CharactersState, action: PayloadAction<number>) => {
       state.total = action.payload;
+    },
+    setIsLoadingList: (
+      state: CharactersState,
+      action: PayloadAction<boolean>
+    ) => {
+      state.isLoadingList = action.payload;
     },
     setCharacters: (
       state: CharactersState,
@@ -54,6 +62,7 @@ export const {
   setCharacters,
   setTotal,
   setCurrentCharacter,
+  setIsLoadingList,
 } = charactersSlice.actions;
 
 // Selectors
@@ -62,6 +71,9 @@ export const selectFilter = (state: RootState) => state.characters.filter;
 export const selectPage = (state: RootState) => state.characters.currentPage;
 
 export const selectTotal = (state: RootState) => state.characters.total;
+
+export const selectIsLoadingList = (state: RootState) =>
+  state.characters.isLoadingList;
 
 export const selectCharacters = (state: RootState) =>
   state.characters.characters;
@@ -80,11 +92,14 @@ export const selectCurrentCharacter = (state: RootState) =>
 export const getListOfCharacters =
   (page = 1, filter = '') =>
   (dispatch: AppDispatch) => {
+    dispatch(setIsLoadingList(true));
+
     charactersService
       .loadListOfCharacters(page, filter)
       .then((charactersResponse) => {
         dispatch(setTotal(charactersResponse.count));
         dispatch(setCharacters(charactersResponse.results));
+        dispatch(setIsLoadingList(false));
       });
   };
 
