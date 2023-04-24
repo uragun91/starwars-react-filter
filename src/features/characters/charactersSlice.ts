@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Character } from './models/character.model';
 import { AppDispatch, RootState } from '../../store/store';
-import { loadListOfCharacters } from '../../shared/services/characters.service';
+import { charactersService } from '../../shared/services/characters.service';
 
 export interface CharactersState {
   currentPage: number;
@@ -39,18 +39,33 @@ export const charactersSlice = createSlice({
     ) => {
       state.characters = action.payload;
     },
+    setCurrentCharacter: (
+      state: CharactersState,
+      action: PayloadAction<Character>
+    ) => {
+      state.currentCharacter = action.payload;
+    },
   },
 });
 
-export const { setPage, setFilter, setCharacters, setTotal } =
-  charactersSlice.actions;
+export const {
+  setPage,
+  setFilter,
+  setCharacters,
+  setTotal,
+  setCurrentCharacter,
+} = charactersSlice.actions;
 
 // Selectors
 export const selectFilter = (state: RootState) => state.characters.filter;
+
 export const selectPage = (state: RootState) => state.characters.currentPage;
+
 export const selectTotal = (state: RootState) => state.characters.total;
+
 export const selectCharacters = (state: RootState) =>
   state.characters.characters;
+
 export const selectCharacterById = (
   id: number
 ): ((state: RootState) => Character | undefined) => {
@@ -58,14 +73,25 @@ export const selectCharacterById = (
     state.characters.characters.find((character) => character.id === id);
 };
 
+export const selectCurrentCharacter = (state: RootState) =>
+  state.characters.currentCharacter;
+
 // Async
 export const getListOfCharacters =
   (page = 1, filter = '') =>
   (dispatch: AppDispatch) => {
-    loadListOfCharacters(page, filter).then((charactersResponse) => {
-      dispatch(setTotal(charactersResponse.count));
-      dispatch(setCharacters(charactersResponse.results));
-    });
+    charactersService
+      .loadListOfCharacters(page, filter)
+      .then((charactersResponse) => {
+        dispatch(setTotal(charactersResponse.count));
+        dispatch(setCharacters(charactersResponse.results));
+      });
   };
+
+export const getCharacterById = (id: number) => (dispatch: AppDispatch) => {
+  charactersService.loadCharacterById(id).then((character) => {
+    dispatch(setCurrentCharacter(character));
+  });
+};
 
 export default charactersSlice.reducer;
