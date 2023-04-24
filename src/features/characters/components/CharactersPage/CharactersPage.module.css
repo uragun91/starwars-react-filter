@@ -1,6 +1,23 @@
+.charactersWrapper {
+  min-height: 100%;
+  background-image: url('/public/back1.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
 .cardsContainer {
   display: flex;
-  gap: 90px;
-  justify-content: center;
+  gap: 50px;
   flex-wrap: wrap;
+}
+
+.header {
+  color: #ffffff;
+  margin-bottom: 50px;
+}
+
+.noCharactersText {
+  color: #ffffff;
 }

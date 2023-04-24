@@ -1,6 +1,15 @@
+import SearchIcon from '@mui/icons-material/Search';
+import {
+  Container,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material';
+import debounce from 'lodash.debounce';
 import React, { useCallback } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+
 import { useAppDispatch } from '../../../../store/hooks';
 import {
   getListOfCharacters,
@@ -9,13 +18,11 @@ import {
   selectPage,
   selectTotal,
   setFilter,
+  setPage,
 } from '../../charactersSlice';
-
-import styles from './CharactersPage.module.css';
-
-import debounce from 'lodash.debounce';
 import { CharacterCard } from '../CharacterCard/CharacterCard';
-import { Container } from '@mui/material';
+import styles from './CharactersPage.module.css';
+import Pagination from '@mui/material/Pagination';
 
 export const CharactersPage = () => {
   const dispatch = useAppDispatch();
@@ -31,23 +38,61 @@ export const CharactersPage = () => {
     dispatch(getListOfCharacters(page, filter));
   }, [page, filter, dispatch]);
 
-  const changeHandler = useCallback(
-    (e: React.FormEvent<HTMLInputElement>) => {
-      const input = e.target as HTMLInputElement;
-      dispatch(setFilter(input.value));
+  const searchChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+    useCallback(
+      (e) => {
+        dispatch(setFilter(e.target.value));
+      },
+      [dispatch]
+    );
+
+  const debouncedSearchChangeHandler = useCallback(
+    debounce(searchChangeHandler, 300),
+    [searchChangeHandler]
+  );
+
+  const paginationChangeHandler = useCallback(
+    (event: React.ChangeEvent<unknown>, value: number) => {
+      dispatch(setPage(value));
     },
     [dispatch]
   );
 
-  const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [
-    changeHandler,
-  ]);
-
   return (
-    <>
+    <div className={styles.charactersWrapper}>
       <Container fixed>
-        <div>Characters Page</div>
-        <input type="text" onChange={debouncedChangeHandler} />
+        <Typography variant="h2" component="h2" className={styles.header}>
+          Star wars characters
+        </Typography>
+        <div>
+          <TextField
+            onChange={debouncedSearchChangeHandler}
+            size="small"
+            label="Search character"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          {!Boolean(characters.length) ? (
+            <Typography className={styles.noCharactersText}>
+              No characters found. Please change search string
+            </Typography>
+          ) : (
+            ''
+          )}
+          <Pagination
+            count={Math.ceil(total / 10)}
+            page={page}
+            showFirstButton
+            showLastButton
+            size="small"
+            onChange={paginationChangeHandler}
+          />
+        </div>
         <div>Total is: {total}</div>
         <div>Filter is: {filter}</div>
         <div className={styles.cardsContainer}>
@@ -61,6 +106,6 @@ export const CharactersPage = () => {
           })}
         </div>
       </Container>
-    </>
+    </div>
   );
 };

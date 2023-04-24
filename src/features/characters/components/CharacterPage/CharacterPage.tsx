@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import styles from './CharacterPage.module.css';
 
 import { useAppDispatch } from '../../../../store/hooks';
 import {
@@ -12,6 +13,8 @@ import {
   setCurrentCharacter,
 } from '../../charactersSlice';
 import { Character } from '../../models/character.model';
+import { Container } from '@mui/system';
+import { Typography } from '@mui/material';
 
 export const CharacterPage = () => {
   let { id: characterId } = useParams();
@@ -44,19 +47,20 @@ export const CharacterPage = () => {
   }, [currentCharacter]);
 
   return (
-    <>
-      <div>Character Page</div>
-      <div>Name:</div>
-      <TextField
-        variant="outlined"
-        value={character?.name}
-        size="small"
-        InputProps={{
-          readOnly: true,
-        }}
-      ></TextField>
-      <div>Gender: {character?.gender}</div>
-      <div>Eyes color: {character?.eye_color}</div>
-    </>
+    <div className={styles.characterPageWrapper}>
+      <Container fixed>
+        <div>Name:</div>
+        <TextField
+          variant="outlined"
+          value={character?.name}
+          size="small"
+          InputProps={{
+            readOnly: true,
+          }}
+        ></TextField>
+        <div>Gender: {character?.gender}</div>
+        <div>Eyes color: {character?.eye_color}</div>
+      </Container>
+    </div>
   );
 };
