@@ -1,29 +1,34 @@
-import TextField from '@mui/material/TextField';
-import React, { useRef, useState } from 'react';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import styles from './CharacterPage.module.css';
-import classnames from 'classnames';
-
-import { useAppDispatch } from '../../../../store/hooks';
-import {
-  getCharacterById,
-  selectCharacterById,
-  selectCurrentCharacter,
-  setCurrentCharacter,
-} from '../../charactersSlice';
-import { Character } from '../../models/character.model';
-import { Container } from '@mui/system';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Avatar,
   Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   Typography,
 } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import { Container } from '@mui/system';
+import classnames from 'classnames';
+import React, { useCallback, useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import Fade from '@mui/material/Fade';
+
+import { useAppDispatch } from '../../../../store/hooks';
+import {
+  getCharacterById,
+  saveCharacter,
+  selectCharacterById,
+  selectCurrentCharacter,
+  selectIsSavingCharacter,
+  setCurrentCharacter,
+} from '../../charactersSlice';
+import { Character } from '../../models/character.model';
+import styles from './CharacterPage.module.css';
 
 export const CharacterPage = () => {
   let { id: characterId } = useParams();
@@ -38,6 +43,7 @@ export const CharacterPage = () => {
   const currentCharacter: Character | null = useSelector(
     selectCurrentCharacter
   );
+  const isSavingCharacter: boolean = useSelector(selectIsSavingCharacter);
 
   const [character, setCharacter] = useState<Character | null>();
 
@@ -47,7 +53,9 @@ export const CharacterPage = () => {
   const [gender, setGender] = useState('');
   const [skinColor, setSkinColor] = useState('');
 
-  useEffect(() => {
+  const [editPersonal, setEditPersonal] = useState(false);
+
+  const resetValues = useCallback(() => {
     if (character) {
       setName(character.name);
       setBirthYear(character.birth_year);
@@ -56,6 +64,25 @@ export const CharacterPage = () => {
       setSkinColor(character.skin_color);
     }
   }, [character]);
+
+  const handleSave = useCallback(() => {
+    setEditPersonal(false);
+
+    const updatedCharacter: Character = {
+      ...(character as Character),
+      name,
+      birth_year: birthYear,
+      hair_color: hairColor,
+      gender,
+      skin_color: skinColor,
+    };
+
+    dispatch(saveCharacter(updatedCharacter));
+  }, [character, name, birthYear, hairColor, gender, skinColor, dispatch]);
+
+  useEffect(() => {
+    resetValues();
+  }, [resetValues]);
 
   // if we cannot get character from the store, for example when we reload the page,
   // we should call api to get the character
@@ -94,16 +121,34 @@ export const CharacterPage = () => {
       <Container fixed>
         <Box className={styles.formContainer}>
           <div className={styles.infoWrapper}>
-            <Typography
-              variant="h5"
-              className={styles.infoTitle}
-              sx={{ mb: 2 }}
+            <Box
+              display={'flex'}
+              alignItems={'center'}
+              justifyContent={'space-between'}
+              mb={2}
             >
-              Personal Data
-            </Typography>
+              <Typography variant="h5" className={styles.infoTitle}>
+                Personal Data
+              </Typography>
+              <Button
+                disabled={isSavingCharacter}
+                onClick={() => {
+                  if (editPersonal) {
+                    resetValues();
+                    setEditPersonal(false);
+                  } else {
+                    setEditPersonal(true);
+                  }
+                }}
+              >
+                {editPersonal ? 'Cancel' : 'Edit'}
+              </Button>
+            </Box>
+
             <Box marginBottom={2}>
               <TextField
                 size="small"
+                disabled={!editPersonal}
                 fullWidth
                 value={name}
                 onChange={(e) => {
@@ -111,12 +156,12 @@ export const CharacterPage = () => {
                 }}
                 label="Name"
                 InputLabelProps={{ shrink: true }}
-                InputProps={{ readOnly: true }}
               />
             </Box>
             <Box marginBottom={2}>
               <TextField
                 size="small"
+                disabled={!editPersonal}
                 fullWidth
                 value={birthYear}
                 onChange={(e) => {
@@ -124,11 +169,10 @@ export const CharacterPage = () => {
                 }}
                 label="Date of birth"
                 InputLabelProps={{ shrink: true }}
-                InputProps={{ readOnly: true }}
               />
             </Box>
             <Box marginBottom={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" disabled={!editPersonal}>
                 <InputLabel id="gender-label">Geneder</InputLabel>
                 <Select
                   labelId="gender-label"
@@ -149,7 +193,7 @@ export const CharacterPage = () => {
               </FormControl>
             </Box>
             <Box marginBottom={2}>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small" disabled={!editPersonal}>
                 <InputLabel id="hair-color-label">Hair Color</InputLabel>
                 <Select
                   labelId="hair-color-label"
@@ -175,8 +219,8 @@ export const CharacterPage = () => {
                 </Select>
               </FormControl>
             </Box>
-            <Box>
-              <FormControl fullWidth size="small">
+            <Box marginBottom={2}>
+              <FormControl fullWidth size="small" disabled={!editPersonal}>
                 <InputLabel id="skin-color-label">Skin Color</InputLabel>
                 <Select
                   labelId="skin-color-label"
@@ -195,6 +239,7 @@ export const CharacterPage = () => {
                   <MenuItem value={'brown'}>Brown</MenuItem>
                   <MenuItem value={'unknown'}>Unknown</MenuItem>
                   <MenuItem value={'green'}>Green</MenuItem>
+                  <MenuItem value={'grey'}>Grey</MenuItem>
                   <MenuItem value={'dark'}>Dark</MenuItem>
                   <MenuItem value={'light'}>Light</MenuItem>
                   <MenuItem value={'brown mottle'}>Brown Mottle</MenuItem>
@@ -205,24 +250,16 @@ export const CharacterPage = () => {
                 </Select>
               </FormControl>
             </Box>
-          </div>
-
-          {Boolean(
-            character?.starships.length || character?.vehicles.length
-          ) ? (
-            <div className={styles.infoWrapper}>
-              <Typography
-                variant="h5"
-                component="h5"
-                className={styles.infoTitle}
-                sx={{ mb: 2 }}
+            <Box textAlign={'end'}>
+              <LoadingButton
+                disabled={!editPersonal}
+                loading={isSavingCharacter}
+                onClick={handleSave}
               >
-                Vehicles & Starships
-              </Typography>
-            </div>
-          ) : (
-            ''
-          )}
+                Save
+              </LoadingButton>
+            </Box>
+          </div>
         </Box>
       </Container>
     </div>

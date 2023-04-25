@@ -1,5 +1,3 @@
-import { Gender } from '../../../shared/models/gender.enum';
-
 export interface Character {
   id: number;
   img: string;
@@ -10,7 +8,7 @@ export interface Character {
   skin_color: string;
   eye_color: string;
   birth_year: string;
-  gender: Gender;
+  gender: string;
   homeworld: string;
   // urls
   films: string[];

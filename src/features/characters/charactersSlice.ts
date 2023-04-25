@@ -11,6 +11,7 @@ export interface CharactersState {
   characters: Character[];
   currentCharacter: Character | null;
   isLoadingList: boolean;
+  isSavingCharacter: boolean;
 }
 
 const initialState: CharactersState = {
@@ -20,6 +21,7 @@ const initialState: CharactersState = {
   characters: [],
   currentCharacter: null,
   isLoadingList: false,
+  isSavingCharacter: false,
 };
 
 export const charactersSlice = createSlice({
@@ -53,6 +55,23 @@ export const charactersSlice = createSlice({
     ) => {
       state.currentCharacter = action.payload;
     },
+    setIsSavingCharacter: (
+      state: CharactersState,
+      action: PayloadAction<boolean>
+    ) => {
+      state.isSavingCharacter = action.payload;
+    },
+    setCharacterById: (
+      state: CharactersState,
+      action: PayloadAction<Character>
+    ) => {
+      const characterIndex = state.characters.findIndex(
+        (char) => char.id === action.payload.id
+      );
+      if (characterIndex > -1) {
+        state.characters[characterIndex] = action.payload;
+      }
+    },
   },
 });
 
@@ -63,6 +82,8 @@ export const {
   setTotal,
   setCurrentCharacter,
   setIsLoadingList,
+  setCharacterById,
+  setIsSavingCharacter,
 } = charactersSlice.actions;
 
 // Selectors
@@ -72,11 +93,20 @@ export const selectPage = (state: RootState) => state.characters.currentPage;
 
 export const selectTotal = (state: RootState) => state.characters.total;
 
-export const selectIsLoadingList = (state: RootState) =>
-  state.characters.isLoadingList;
+export const selectIsLoadingList = (state: RootState) => {
+  return state.characters.isLoadingList;
+};
 
-export const selectCharacters = (state: RootState) =>
-  state.characters.characters;
+export const selectCharacters = (state: RootState) => {
+  return state.characters.characters;
+};
+
+export const selectCurrentCharacter = (state: RootState) =>
+  state.characters.currentCharacter;
+
+export const selectIsSavingCharacter = (state: RootState) => {
+  return state.characters.isSavingCharacter;
+};
 
 export const selectCharacterById = (
   id: number
@@ -84,9 +114,6 @@ export const selectCharacterById = (
   return (state: RootState) =>
     state.characters.characters.find((character) => character.id === id);
 };
-
-export const selectCurrentCharacter = (state: RootState) =>
-  state.characters.currentCharacter;
 
 // Async
 export const getListOfCharacters =
@@ -108,5 +135,15 @@ export const getCharacterById = (id: number) => (dispatch: AppDispatch) => {
     dispatch(setCurrentCharacter(character));
   });
 };
+
+export const saveCharacter =
+  (character: Character) => (dispatch: AppDispatch) => {
+    dispatch(setIsSavingCharacter(true));
+    charactersService.saveCharacterToLocalStorage(character).then(() => {
+      dispatch(setCharacterById(character));
+      dispatch(setCurrentCharacter(character));
+      dispatch(setIsSavingCharacter(false));
+    });
+  };
 
 export default charactersSlice.reducer;
